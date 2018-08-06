@@ -31,8 +31,8 @@ public class CamundaTaskClient {
         return restTemplate.getForObject(camundaHost + "/task/", CamundaTask[].class);
     }
 
-    public ResponseEntity<String> completeCamundaTask(CamundaTask task) {
-        String url = camundaHost + URL_GET_CAMUNDA_TASKS + task.getId() + COMPLETE_TASK;
+    public ResponseEntity<String> completeCamundaTask(String camundaTaskId) {
+        String url = camundaHost + URL_GET_CAMUNDA_TASKS + camundaTaskId + COMPLETE_TASK;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(EMPTY_REQUEST_BODY, headers);
