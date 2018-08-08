@@ -4,7 +4,7 @@ public class CamundaTask {
 
     private String id;
     private String name;
-    private String assigne;
+    private String assignee;
     private String created;
     private String due;
     private String followUp;
@@ -40,12 +40,12 @@ public class CamundaTask {
         this.name = name;
     }
 
-    public String getAssigne() {
-        return assigne;
+    public String getAssignee() {
+        return assignee;
     }
 
-    public void setAssigne(String assigne) {
-        this.assigne = assigne;
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
 
     public String getCreated() {
@@ -194,7 +194,7 @@ public class CamundaTask {
 
     @Override
     public String toString() {
-        return "CamundaTask [id=" + id + ", name=" + name + ", assigne=" + assigne + ", created=" + created + ", due="
+        return "CamundaTask [id=" + id + ", name=" + name + ", assigne=" + assignee + ", created=" + created + ", due="
             + due + ", followUp=" + followUp + ", delegationState=" + delegationState + ", description="
             + description + ", executionId=" + executionId + ", owner=" + owner + ", parentTaskId=" + parentTaskId
             + ", priority=" + priority + ", processDefinitionId=" + processDefinitionId + ", processInstanceId="
