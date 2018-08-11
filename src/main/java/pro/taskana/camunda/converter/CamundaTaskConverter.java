@@ -30,6 +30,11 @@ import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.TaskImpl;
 
+/**
+ * Converter that creates a Taskana task of a Camunda task.
+ * 
+ * @author kkl
+ */
 @Component
 public class CamundaTaskConverter {
 
@@ -52,22 +57,19 @@ public class CamundaTaskConverter {
     private static final String DEFAULT_TYPE = "DEFAULT_TYPE";
     private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
 
-    public Task toTaskanaTask(CamundaTask camundaTask)
+    public Task toTaskanaTask(CamundaTask camundaTask, String camundaHost)
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
         WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException {
 
-        Workbasket workbasket = createWorkbasket(camundaTask.getAssignee(), DEFAULT_DOMAIN);
-
-        Classification classification = createClassification(DEFAULT_CLASSIFICATION, DEFAULT_DOMAIN,
-            camundaTask.getPriority());
-
-        ObjectReference objectReference = createObjectReference(DEFAULT_COMPANY, DEFAULT_SYSTEM,
-            DEFAULT_SYSTEM_INSTANCE, DEFAULT_TYPE, DEFAULT_VALUE);
+        Workbasket workbasket = createWorkbasket(camundaTask.getAssignee());
+        Classification classification = createClassification();
+        ObjectReference objectReference = createObjectReference();
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
 
         HashMap<String, String> callbackInfo = new HashMap<>();
         callbackInfo.put("camunda_task_id", camundaTask.getId());
+        callbackInfo.put("camunda_host", camundaHost);
         taskanaTask.setCallbackInfo(callbackInfo);
 
         taskanaTask.setName(camundaTask.getName());
@@ -90,16 +92,16 @@ public class CamundaTaskConverter {
         return result;
     }
 
-    private Workbasket createWorkbasket(String key, String domain) throws DomainNotFoundException,
+    private Workbasket createWorkbasket(String key) throws DomainNotFoundException,
         InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException {
         if (key == null) {
             key = DEFAULT_WORKBASKET;
         }
         Workbasket wb;
         try {
-            wb = workbasketService.getWorkbasket(key, domain);
+            wb = workbasketService.getWorkbasket(key, DEFAULT_DOMAIN);
         } catch (WorkbasketNotFoundException e) {
-            wb = workbasketService.newWorkbasket(key, domain);
+            wb = workbasketService.newWorkbasket(key, DEFAULT_DOMAIN);
             wb.setName(key);
             wb.setType(WorkbasketType.PERSONAL);
             wb = workbasketService.createWorkbasket(wb);
@@ -107,29 +109,28 @@ public class CamundaTaskConverter {
         return wb;
     }
 
-    private Classification createClassification(String key, String domain, String priority)
+    private Classification createClassification()
         throws ClassificationAlreadyExistException, NotAuthorizedException,
         DomainNotFoundException, InvalidArgumentException {
 
         Classification classification;
         try {
-            classification = classificationService.getClassification(key, domain);
+            classification = classificationService.getClassification(DEFAULT_CLASSIFICATION, DEFAULT_DOMAIN);
         } catch (ClassificationNotFoundException e) {
-            classification = classificationService.newClassification(key, domain, CLASSIFICATION_TYPE_TASK);
-            classification.setPriority(Integer.parseInt(priority));
+            classification = classificationService.newClassification(DEFAULT_CLASSIFICATION, DEFAULT_DOMAIN,
+                CLASSIFICATION_TYPE_TASK);
             classification = classificationService.createClassification(classification);
         }
         return classification;
     }
 
-    private ObjectReference createObjectReference(String company, String system, String systemInstance,
-        String type, String value) {
+    private ObjectReference createObjectReference() {
         ObjectReference objRef = new ObjectReference();
-        objRef.setCompany(company);
-        objRef.setSystem(system);
-        objRef.setSystemInstance(systemInstance);
-        objRef.setType(type);
-        objRef.setValue(value);
+        objRef.setCompany(DEFAULT_COMPANY);
+        objRef.setSystem(DEFAULT_SYSTEM);
+        objRef.setSystemInstance(DEFAULT_SYSTEM_INSTANCE);
+        objRef.setType(DEFAULT_TYPE);
+        objRef.setValue(DEFAULT_VALUE);
         return objRef;
     }
 

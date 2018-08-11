@@ -1,5 +1,10 @@
 package pro.taskana.camunda.model;
 
+/**
+ * POJO that represents a Camunda task.
+ * 
+ * @author kkl
+ */
 public class CamundaTask {
 
     private String id;
