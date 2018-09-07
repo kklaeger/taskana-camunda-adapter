@@ -1,6 +1,8 @@
 package pro.taskana.camunda.client;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -37,7 +39,9 @@ public class CamundaTaskClient {
         if (createdAfter == null) {
             requestBody = EMPTY_REQUEST_BODY;
         } else {
-            requestBody = "{\"createdAfter\": \"" + createdAfter.toString().replaceAll("Z$", "+0000") + "\"}";
+            Date date = Date.from(createdAfter);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            requestBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

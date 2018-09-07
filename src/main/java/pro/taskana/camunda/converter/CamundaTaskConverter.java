@@ -32,7 +32,7 @@ import pro.taskana.impl.TaskImpl;
 
 /**
  * Converter that creates a Taskana task of a Camunda task.
- * 
+ *
  * @author kkl
  */
 @Component
@@ -88,8 +88,8 @@ public class CamundaTaskConverter {
         TemporalAccessor temporalAccessor = formatter.parse(date);
         LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
-        Instant result = Instant.from(zonedDateTime);
-        return result;
+        Instant instant = Instant.from(zonedDateTime);
+        return instant;
     }
 
     private Workbasket createWorkbasket(String key) throws DomainNotFoundException,

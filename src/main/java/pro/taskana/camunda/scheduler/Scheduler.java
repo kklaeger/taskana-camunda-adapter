@@ -69,25 +69,24 @@ public class Scheduler {
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
         WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException,
         WorkbasketNotFoundException, ClassificationNotFoundException, TaskAlreadyExistException {
-
-        Instant createdAfter = timestampMapper.getLatestTimestampOfCreated();
-        Instant now = Instant.now();
         for (String camundaHost : camundaHosts) {
+            Instant createdAfter = timestampMapper.getLatestCreatedTimestamp(camundaHost);
+            Instant now = Instant.now();
             for (CamundaTask camundaTask : camundaClient.retrieveCamundaTasks(camundaHost, createdAfter)) {
                 Task taskanaTask = camundaTaskConverter.toTaskanaTask(camundaTask, camundaHost);
                 taskanaTask = taskService.createTask(taskanaTask);
                 LOGGER.info("Task \"" + taskanaTask.getName() + "\" with Taskana ID " + taskanaTask.getId()
                     + "and Camunda ID " + camundaTask.getId() + " created");
             }
-            timestampMapper.clearCreateTable();
-            timestampMapper.insertCreated(UUID.randomUUID().toString(), now);
+            timestampMapper.removeLatestCreatedTimestamp(camundaHost);
+            timestampMapper.insertCreatedTimestamp(UUID.randomUUID().toString(), now, camundaHost);
         }
     }
 
     @Scheduled(fixedRate = 5000)
     public void completeTaskanaTasks() throws InterruptedException, TaskNotFoundException, NotAuthorizedException {
         Instant now = Instant.now();
-        Instant completedAfter = timestampMapper.getLatestTimestampOfCompleted();
+        Instant completedAfter = timestampMapper.getLatestCompletedTimestamp();
         TimeInterval completedIn = new TimeInterval(completedAfter, now);
 
         List<TaskSummary> taskanaTaskSummaries = taskService.createTaskQuery()
@@ -105,7 +104,7 @@ public class Scheduler {
             }
         }
         timestampMapper.clearCompletedTable();
-        timestampMapper.insertCompleted(UUID.randomUUID().toString(), now);
+        timestampMapper.insertCompletedTimestamp(UUID.randomUUID().toString(), now);
     }
 
     private void initCamundaHosts(String camundaHostsNames) {
